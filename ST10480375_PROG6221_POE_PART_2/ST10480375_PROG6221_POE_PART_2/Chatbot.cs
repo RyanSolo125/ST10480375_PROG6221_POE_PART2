@@ -81,11 +81,11 @@ namespace ST10480375_PROG6221_POE_PART_2
 
         public string GetResponse(string userInput)
         {
-            // make input lowercase so comparisons work easily
             string input = userInput.ToLower();
 
             // detect sentiment first
             string sentimentNote = DetectSentiment(input);
+            bool hasSentiment = sentimentNote != "";
 
             // check if user is telling us their name
             if (input.Contains("my name is"))
@@ -148,11 +148,24 @@ namespace ST10480375_PROG6221_POE_PART_2
                 }
             }
 
+            // if sentiment was detected but no keyword matched, still respond empathetically
+            // and give a tip based on the last topic or ask what they need help with
+            if (hasSentiment)
+            {
+                if (memory.LastTopic != null)
+                {
+                    string tip = GetRandomResponse(memory.LastTopic);
+                    return sentimentNote + tip;
+                }
+                return sentimentNote + "I'm here to help. You can ask me about phishing, passwords, scams, malware and more. Type 'help' to see all topics.";
+            }
+
             // default fallback if nothing matched
             return "I'm not sure I understand. Type 'help' to see what I can assist with.";
         }
 
-        // picks a random response from the list for a given topic
+
+        // picks a random response from the list for a topic
         private string GetRandomResponse(string topic)
         {
             List<string> options = responses[topic];
@@ -160,20 +173,38 @@ namespace ST10480375_PROG6221_POE_PART_2
             return options[index];
         }
 
-        // detects the user's mood and adds an empathetic prefix
+        // detects the user's mood and adds an empathy
         private string DetectSentiment(string input)
         {
-            if (input.Contains("worried") || input.Contains("scared") || input.Contains("anxious"))
-                return "It's completely understandable to feel that way. Here's something that can help: ";
+            // worried / scared
+            if (input.Contains("worried") || input.Contains("scared") ||
+                input.Contains("anxious") || input.Contains("nervous") ||
+                input.Contains("afraid") || input.Contains("unsafe"))
+            {
+                return "It's completely understandable to feel that way. " +
+                       "Scammers and cybercriminals can be very convincing. " +
+                       "Let me share something that can help:\n";
+            }
 
-            if (input.Contains("frustrated") || input.Contains("confused") || input.Contains("don't understand"))
-                return "I hear you, cybersecurity can be tricky. Let me simplify: ";
+            // frustrated / confused
+            if (input.Contains("frustrated") || input.Contains("confused") ||
+                input.Contains("don't understand") || input.Contains("complicated") ||
+                input.Contains("difficult") || input.Contains("too hard"))
+            {
+                return "I hear you — cybersecurity can feel overwhelming at first. " +
+                       "Let me break it down simply:\n";
+            }
 
-            if (input.Contains("curious") || input.Contains("interesting") || input.Contains("tell me more"))
-                return "Great curiosity! ";
+            // curious
+            if (input.Contains("curious") || input.Contains("interesting") ||
+                input.Contains("want to know") || input.Contains("tell me about"))
+            {
+                return "Great curiosity — learning about this is the first step to staying safe!\n";
+            }
 
             return "";
         }
+
 
         // builds a sentence from what we remember about the user
         private string GetMemorySummary()

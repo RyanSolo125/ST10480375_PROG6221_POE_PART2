@@ -79,7 +79,7 @@ namespace ST10480375_PROG6221_POE_PART_2
             ChatScroller.ScrollToBottom();
         }
 
-        // adds a bot message to the chat in cyan
+        // adds a bot message to the chat in cyan blue
         private void AddBotMessage(string text)
         {
             Paragraph para = new Paragraph();
@@ -108,7 +108,7 @@ namespace ST10480375_PROG6221_POE_PART_2
             }
             catch
             {
-                // no voice file found, continue without it
+                // no voice file found then continue without it
             }
         }
     }
